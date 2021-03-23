@@ -5,12 +5,15 @@ import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink } from '@apollo/c
 import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
+import { Provider } from 'react-redux';
 
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
+import configureStore from './store/configStore';
+const { store } = configureStore();
 
- const httpsLink = new HttpLink({
+ const httpsLink: any = new HttpLink({
   uri: 'https://fileupload-cloud.hasura.app/v1/graphql',
   headers: {
     'x-hasura-admin-secret': "iuvT4KdYjFELpe7x0teyWjK7wDsxLu9VjTQ46OGzm1v9tvpRZNpbNo4FEPjaS26i"
@@ -29,7 +32,7 @@ const wssLink = new WebSocketLink({
   }
 });
 
-const link = split(
+const link: any = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
     return (
@@ -59,8 +62,12 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
+        <ApolloProvider client={client}>
+          <Provider store={store}>
+            <Navigation colorScheme={colorScheme} />
+            <StatusBar />
+          </Provider>
+        </ApolloProvider>
       </SafeAreaProvider>
     );
   }
